@@ -19,9 +19,7 @@ def predict_salary(salary_from, salary_to):
 
 def predict_rub_salary_for_hh(vacancy):
     salary = vacancy['salary']
-    if not salary or salary['currency'] != 'RUR':
-        return None
-    else:
+    if salary and salary['currency'] == 'RUR':
         return predict_salary(salary['from'], salary['to'])
 
 
@@ -63,10 +61,9 @@ def show_job_statistics_from_hh(email, profession, languages):
 
 
 def predict_rub_salary_for_sj(vacancy):
-    if vacancy['currency'] != 'rub':
-        return None
-    else:
+    if vacancy['currency'] == 'rub':
         return predict_salary(vacancy['payment_from'], vacancy['payment_to'])
+
 
 
 def show_job_statistics_from_sj(token, profession, languages):
