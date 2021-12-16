@@ -11,13 +11,15 @@ def predict_salary(salary_from, salary_to):
         return (salary_from + salary_to) / 2
     elif not salary_from:
         return salary_to * 0.8
-    else:
+    elif not salary_to:
         return salary_from * 1.2
+    else:
+        return None
 
 
 def predict_rub_salary_for_hh(vacancy):
     salary = vacancy['salary']
-    if salary['currency'] != 'RUR':
+    if not salary or salary['currency'] != 'RUR':
         return None
     else:
         return predict_salary(salary['from'], salary['to'])
@@ -37,7 +39,6 @@ def show_job_statistics_from_hh(email, profession, languages):
                           'area': '1',
                           'period': 30,
                           'per_page': 100,
-                          'only_with_salary': True,
                           'page': page
                           }
             page_response = requests.get(url,
@@ -45,15 +46,16 @@ def show_job_statistics_from_hh(email, profession, languages):
                                          params=parameters)
             page_response.raise_for_status()
             page_content = page_response.json()
-            if page >= page_content['pages']:
-                break
             for vacancy in page_content['items']:
                 vacancies.append(vacancy)
+            max_page = 19
+            if page == page_content['pages'] or page == max_page:
+                break
         salaries = [predict_rub_salary_for_hh(vacancy) for vacancy
                     in vacancies if predict_rub_salary_for_hh(vacancy)]
         if len(vacancies):
             job_statistics[language] = {
-                'vacancies_found': len(vacancies),
+                'vacancies_found': page_content['found'],
                 'vacancies_processed': len(salaries),
                 'average_salary': int(sum(salaries) / len(salaries))
             }
@@ -67,7 +69,7 @@ def predict_rub_salary_for_sj(vacancy):
         return predict_salary(vacancy['payment_from'], vacancy['payment_to'])
 
 
-def show_job_statistics_from_js(token, profession, languages):
+def show_job_statistics_from_sj(token, profession, languages):
     host = 'https://api.superjob.ru/2.0/'
     path = 'vacancies'
     url = os.path.join(host, path)
@@ -79,7 +81,6 @@ def show_job_statistics_from_js(token, profession, languages):
             parameters = {'town': '4',
                           'catalogues': [48],
                           'keywords': [profession, language],
-                          'no_agreement': 1,
                           'page': page,
                           'count': 100
                           }
@@ -127,10 +128,11 @@ if __name__ == '__main__':
     sj_token = os.environ['SJ_TOKEN']
     programming_languages = ['TypeScript', 'Swift', 'Scala',
                              'Objective-C', 'Shell', 'Go',
-                             'C', 'C#', 'C++', 'PHP', 'Ruby',
+                             'C',
+                             'C#', 'C++', 'PHP', 'Ruby',
                              'Python', 'Java', 'JavaScript'
                              ]
     show_job_statistics_from_hh(
         user_email, profession_name, programming_languages)
-    show_job_statistics_from_js(
+    show_job_statistics_from_sj(
         sj_token, profession_name, programming_languages)
