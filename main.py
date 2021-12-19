@@ -22,7 +22,7 @@ def predict_rub_salary_for_hh(vacancy):
         return predict_salary(salary['from'], salary['to'])
 
 
-def get_job_statistics_from_hh(email, profession, language):
+def get_job_statistics_from_hh(email, profession, programming_language):
     host = 'https://api.hh.ru/'
     path = 'vacancies'
     url = os.path.join(host, path)
@@ -33,7 +33,7 @@ def get_job_statistics_from_hh(email, profession, language):
     quantity_of_vacancies_on_page = 100
     vacancies = []
     for page in count():
-        parameters = {'text': f'{profession} {language}',
+        parameters = {'text': f'{profession} {programming_language}',
                       'vacancy_search_fields': search_fields,
                       'area': area_id,
                       'period': vacancy_age_in_days,
@@ -67,7 +67,7 @@ def predict_rub_salary_for_sj(vacancy):
         return predict_salary(vacancy['payment_from'], vacancy['payment_to'])
 
 
-def get_job_statistics_from_sj(token, profession, language):
+def get_job_statistics_from_sj(token, profession, programming_language):
     host = 'https://api.superjob.ru/2.0/'
     path = 'vacancies'
     url = os.path.join(host, path)
@@ -79,7 +79,7 @@ def get_job_statistics_from_sj(token, profession, language):
     for page in count():
         parameters = {'town': town_id,
                       'catalogues': profession_identifiers,
-                      'keywords': [profession, language],
+                      'keywords': [profession, programming_language],
                       'page': page,
                       'count': quantity_of_vacancies_on_page
                       }
@@ -111,8 +111,8 @@ def create_table_with_statistics(vacancy_statistics, table_name):
                      'Вакансий обработано',
                      'Средняя зарплата']
     table_rows = [table_headers]
-    for language, statistics in vacancy_statistics.items():
-        table_row = [language,
+    for programming_language, statistics in vacancy_statistics.items():
+        table_row = [programming_language,
                      statistics['vacancies_found'],
                      statistics['vacancies_processed'],
                      statistics['average_salary']]
@@ -133,13 +133,13 @@ if __name__ == '__main__':
                              ]
     job_statistics_from_hh = {}
     job_statistics_from_sj = {}
-    for programming_language in programming_languages:
-        job_statistics_from_hh[programming_language] = get_job_statistics_from_hh(
-            user_email, profession_name, programming_language)
-        job_statistics_from_sj[programming_language] = get_job_statistics_from_sj(
-            sj_token, profession_name, programming_language)
-    print(
-        create_table_with_statistics(job_statistics_from_hh, 'HeadHunter Moscow'),
-        create_table_with_statistics(job_statistics_from_sj, 'SuperJob Moscow'),
-        sep='\n'
-        )
+    for language in programming_languages:
+        job_statistics_from_hh[language] = get_job_statistics_from_hh(
+            user_email, profession_name, language)
+        job_statistics_from_sj[language] = get_job_statistics_from_sj(
+            sj_token, profession_name, language)
+    hh_statistic_table = create_table_with_statistics(
+        job_statistics_from_hh, 'HeadHunter Moscow')
+    sj_statistic_table = create_table_with_statistics(
+        job_statistics_from_sj, 'SuperJob Moscow')
+    print(hh_statistic_table, sj_statistic_table, sep='\n')
