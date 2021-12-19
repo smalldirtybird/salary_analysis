@@ -111,11 +111,11 @@ def create_table_with_statistics(vacancy_statistics, table_name):
                      'Вакансий обработано',
                      'Средняя зарплата']
     table_rows = [table_headers]
-    for statistic in vacancy_statistics:
-        table_row = [statistic,
-                     vacancy_statistics[statistic]['vacancies_found'],
-                     vacancy_statistics[statistic]['vacancies_processed'],
-                     vacancy_statistics[statistic]['average_salary']]
+    for language, statistics in vacancy_statistics.items():
+        table_row = [language,
+                     statistics['vacancies_found'],
+                     statistics['vacancies_processed'],
+                     statistics['average_salary']]
         table_rows.append(table_row)
     table_instance = AsciiTable(table_rows, title)
     return table_instance.table
