@@ -50,8 +50,11 @@ def get_job_statistics_from_hh(email, profession, language):
         max_page = 19
         if page == page_content['pages'] or page == max_page:
             break
-    salaries = [predict_rub_salary_for_hh(vacancy) for vacancy
-                in vacancies if predict_rub_salary_for_hh(vacancy)]
+    salaries = []
+    for vacancy in vacancies:
+        average_salary = predict_rub_salary_for_hh(vacancy)
+        if average_salary:
+            salaries.append(average_salary)
     return {
         'vacancies_found': page_content['found'],
         'vacancies_processed': len(salaries),
@@ -89,8 +92,11 @@ def get_job_statistics_from_sj(token, profession, language):
             vacancies.append(vacancy)
         if not page_content['more']:
             break
-    salaries = [predict_rub_salary_for_sj(vacancy) for vacancy
-                in vacancies if predict_rub_salary_for_sj(vacancy)]
+    salaries = []
+    for vacancy in vacancies:
+        average_salary = predict_rub_salary_for_sj(vacancy)
+        if average_salary:
+            salaries.append(average_salary)
     return {
         'vacancies_found': len(vacancies),
         'vacancies_processed': len(salaries),
