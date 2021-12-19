@@ -118,7 +118,7 @@ def create_table_with_statistics(vacancy_statistics, table_name):
                      vacancy_statistics[statistic]['average_salary']]
         table_rows.append(table_row)
     table_instance = AsciiTable(table_rows, title)
-    print(table_instance.table)
+    return table_instance.table
 
 
 if __name__ == '__main__':
@@ -138,5 +138,8 @@ if __name__ == '__main__':
             user_email, profession_name, programming_language)
         job_statistics_from_sj[programming_language] = get_job_statistics_from_sj(
             sj_token, profession_name, programming_language)
-    create_table_with_statistics(job_statistics_from_hh, 'HeadHunter Moscow')
-    create_table_with_statistics(job_statistics_from_sj, 'SuperJob Moscow')
+    print(
+        create_table_with_statistics(job_statistics_from_hh, 'HeadHunter Moscow'),
+        create_table_with_statistics(job_statistics_from_sj, 'SuperJob Moscow'),
+        sep='\n'
+        )
