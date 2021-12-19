@@ -27,13 +27,17 @@ def get_job_statistics_from_hh(email, profession, language):
     path = 'vacancies'
     url = os.path.join(host, path)
     headers = {'User-Agent': email}
+    search_fields = 'в названии вакансии'
+    area_id = 1
+    vacancy_age_in_days = 30
+    quantity_of_vacancies_on_page = 100
     vacancies = []
     for page in count():
         parameters = {'text': f'{profession} {language}',
-                      'vacancy_search_fields': 'в названии вакансии',
-                      'area': '1',
-                      'period': 30,
-                      'per_page': 100,
+                      'vacancy_search_fields': search_fields,
+                      'area': area_id,
+                      'period': vacancy_age_in_days,
+                      'per_page': quantity_of_vacancies_on_page,
                       'page': page
                       }
         page_response = requests.get(url,
@@ -65,13 +69,16 @@ def get_job_statistics_from_sj(token, profession, language):
     path = 'vacancies'
     url = os.path.join(host, path)
     headers = {'X-Api-App-Id': token}
+    town_id = 4
+    profession_identifiers = [48]
+    quantity_of_vacancies_on_page = 100
     vacancies = []
     for page in count():
-        parameters = {'town': '4',
-                      'catalogues': [48],
+        parameters = {'town': town_id,
+                      'catalogues': profession_identifiers,
                       'keywords': [profession, language],
                       'page': page,
-                      'count': 100
+                      'count': quantity_of_vacancies_on_page
                       }
         page_response = requests.get(url,
                                      headers=headers,
@@ -115,8 +122,7 @@ if __name__ == '__main__':
     sj_token = os.environ['SJ_TOKEN']
     programming_languages = ['TypeScript', 'Swift', 'Scala',
                              'Objective-C', 'Shell', 'Go',
-                             'C',
-                             'C#', 'C++', 'PHP', 'Ruby',
+                             'C', 'C#', 'C++', 'PHP', 'Ruby',
                              'Python', 'Java', 'JavaScript'
                              ]
     job_statistics_from_hh = {}
