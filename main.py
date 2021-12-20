@@ -20,7 +20,7 @@ def predict_rub_salary_for_hh(vacancy):
         return predict_salary(salary['from'], salary['to'])
 
 
-def get_job_statistics_from_hh(email, profession, programming_language):
+def get_hh_vacancies(email, profession, programming_language):
     host = 'https://api.hh.ru/'
     path = 'vacancies'
     url = os.path.join(host, path)
@@ -45,14 +45,17 @@ def get_job_statistics_from_hh(email, profession, programming_language):
         page_content = page_response.json()
         vacancies.extend(page_content['items'])
         if page == page_content['pages'] - 1:
-            break
+            return vacancies, page_content['found']
+
+
+def calculate_hh_statistics(vacancies, vacancies_found):
     salaries = []
     for vacancy in vacancies:
         average_salary = predict_rub_salary_for_hh(vacancy)
         if average_salary:
             salaries.append(average_salary)
     return {
-        'vacancies_found': page_content['found'],
+        'vacancies_found': vacancies_found,
         'vacancies_processed': len(salaries),
         'average_salary': int(sum(salaries) / len(salaries))
     }
@@ -63,7 +66,7 @@ def predict_rub_salary_for_sj(vacancy):
         return predict_salary(vacancy['payment_from'], vacancy['payment_to'])
 
 
-def get_job_statistics_from_sj(token, profession, programming_language):
+def get_sj_vacancies(token, profession, programming_language):
     host = 'https://api.superjob.ru/2.0/'
     path = 'vacancies'
     url = os.path.join(host, path)
@@ -86,14 +89,17 @@ def get_job_statistics_from_sj(token, profession, programming_language):
         page_content = page_response.json()
         vacancies.extend(page_content['objects'])
         if not page_content['more']:
-            break
+            return vacancies, page_content['total']
+
+
+def calculate_sj_statistics(vacancies, vacancies_found):
     salaries = []
     for vacancy in vacancies:
         average_salary = predict_rub_salary_for_sj(vacancy)
         if average_salary:
             salaries.append(average_salary)
     return {
-        'vacancies_found': len(vacancies),
+        'vacancies_found': vacancies_found,
         'vacancies_processed': len(salaries),
         'average_salary': int(sum(salaries) / len(salaries))
         }
@@ -128,10 +134,14 @@ if __name__ == '__main__':
     job_statistics_from_hh = {}
     job_statistics_from_sj = {}
     for language in programming_languages:
-        job_statistics_from_hh[language] = get_job_statistics_from_hh(
+        hh_vacancies, hh_vacancies_quantity = get_hh_vacancies(
             user_email, profession_name, language)
-        job_statistics_from_sj[language] = get_job_statistics_from_sj(
+        job_statistics_from_hh[language] = calculate_hh_statistics(
+            hh_vacancies, hh_vacancies_quantity)
+        sj_vacancies, sj_vacancies_quantity = get_sj_vacancies(
             sj_token, profession_name, language)
+        job_statistics_from_sj[language] = calculate_sj_statistics(
+            sj_vacancies, sj_vacancies_quantity)
     hh_statistic_table = create_table_with_statistics(
         job_statistics_from_hh, 'HeadHunter Moscow')
     sj_statistic_table = create_table_with_statistics(
