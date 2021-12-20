@@ -29,15 +29,15 @@ def get_job_statistics_from_hh(email, profession, programming_language):
     area_id = 1
     vacancy_age_in_days = 30
     quantity_of_vacancies_on_page = 100
+    parameters = {'text': f'{profession} {programming_language}',
+                  'vacancy_search_fields': search_fields,
+                  'area': area_id,
+                  'period': vacancy_age_in_days,
+                  'per_page': quantity_of_vacancies_on_page
+                  }
     vacancies = []
     for page in count():
-        parameters = {'text': f'{profession} {programming_language}',
-                      'vacancy_search_fields': search_fields,
-                      'area': area_id,
-                      'period': vacancy_age_in_days,
-                      'per_page': quantity_of_vacancies_on_page,
-                      'page': page
-                      }
+        parameters['page'] = page
         page_response = requests.get(url,
                                      headers=headers,
                                      params=parameters)
@@ -71,14 +71,14 @@ def get_job_statistics_from_sj(token, profession, programming_language):
     town_id = 4
     profession_identifiers = [48]
     quantity_of_vacancies_on_page = 100
+    parameters = {'town': town_id,
+                  'catalogues': profession_identifiers,
+                  'keywords': [profession, programming_language],
+                  'count': quantity_of_vacancies_on_page
+                  }
     vacancies = []
     for page in count():
-        parameters = {'town': town_id,
-                      'catalogues': profession_identifiers,
-                      'keywords': [profession, programming_language],
-                      'page': page,
-                      'count': quantity_of_vacancies_on_page
-                      }
+        parameters['page'] = page,
         page_response = requests.get(url,
                                      headers=headers,
                                      params=parameters)
