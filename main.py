@@ -51,13 +51,14 @@ def get_hh_vacancies(email, profession, programming_language):
 def calculate_hh_statistics(vacancies, vacancies_found):
     salaries = []
     for vacancy in vacancies:
-        average_salary = predict_rub_salary_for_hh(vacancy)
-        if average_salary:
-            salaries.append(average_salary)
+        predicted_salary = predict_rub_salary_for_hh(vacancy)
+        if predicted_salary:
+            salaries.append(predicted_salary)
+    average_salary = sum(salaries) / len(salaries) if len(salaries) else 0
     return {
         'vacancies_found': vacancies_found,
         'vacancies_processed': len(salaries),
-        'average_salary': int(sum(salaries) / len(salaries))
+        'average_salary': average_salary
     }
 
 
@@ -95,14 +96,15 @@ def get_sj_vacancies(token, profession, programming_language):
 def calculate_sj_statistics(vacancies, vacancies_found):
     salaries = []
     for vacancy in vacancies:
-        average_salary = predict_rub_salary_for_sj(vacancy)
-        if average_salary:
-            salaries.append(average_salary)
+        predicted_salary = predict_rub_salary_for_sj(vacancy)
+        if predicted_salary:
+            salaries.append(predicted_salary)
+    average_salary = sum(salaries) / len(salaries) if len(salaries) else 0
     return {
         'vacancies_found': vacancies_found,
         'vacancies_processed': len(salaries),
-        'average_salary': int(sum(salaries) / len(salaries))
-        }
+        'average_salary': average_salary
+    }
 
 
 def create_table_with_statistics(vacancy_statistics, table_name):
