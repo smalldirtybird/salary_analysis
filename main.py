@@ -12,8 +12,6 @@ def predict_salary(salary_from, salary_to):
         return salary_to * 0.8
     elif not salary_to:
         return salary_from * 1.2
-    else:
-        return None
 
 
 def predict_rub_salary_for_hh(vacancy):
@@ -45,10 +43,8 @@ def get_job_statistics_from_hh(email, profession, programming_language):
                                      params=parameters)
         page_response.raise_for_status()
         page_content = page_response.json()
-        for vacancy in page_content['items']:
-            vacancies.append(vacancy)
-        max_page = 19
-        if page == page_content['pages'] or page == max_page:
+        vacancies.extend(page_content['items'])
+        if page == page_content['pages'] - 1:
             break
     salaries = []
     for vacancy in vacancies:
@@ -88,8 +84,7 @@ def get_job_statistics_from_sj(token, profession, programming_language):
                                      params=parameters)
         page_response.raise_for_status()
         page_content = page_response.json()
-        for vacancy in page_content['objects']:
-            vacancies.append(vacancy)
+        vacancies.extend(page_content['objects'])
         if not page_content['more']:
             break
     salaries = []
@@ -105,7 +100,6 @@ def get_job_statistics_from_sj(token, profession, programming_language):
 
 
 def create_table_with_statistics(vacancy_statistics, table_name):
-    title = table_name
     table_headers = ['Язык программирования',
                      'Вакансий найдено',
                      'Вакансий обработано',
@@ -117,7 +111,7 @@ def create_table_with_statistics(vacancy_statistics, table_name):
                      statistics['vacancies_processed'],
                      statistics['average_salary']]
         table_rows.append(table_row)
-    table_instance = AsciiTable(table_rows, title)
+    table_instance = AsciiTable(table_rows, table_name)
     return table_instance.table
 
 
