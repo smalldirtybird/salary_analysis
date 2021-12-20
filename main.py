@@ -14,7 +14,7 @@ def predict_salary(salary_from, salary_to):
         return salary_from * 1.2
 
 
-def predict_rub_salary_for_hh(vacancy):
+def predict_hh_rub_salary(vacancy):
     salary = vacancy['salary']
     if salary and salary['currency'] == 'RUR':
         return predict_salary(salary['from'], salary['to'])
@@ -51,10 +51,10 @@ def get_hh_vacancies(email, profession, programming_language):
 def calculate_hh_statistics(vacancies, vacancies_found):
     salaries = []
     for vacancy in vacancies:
-        predicted_salary = predict_rub_salary_for_hh(vacancy)
+        predicted_salary = predict_hh_rub_salary(vacancy)
         if predicted_salary:
             salaries.append(predicted_salary)
-    average_salary = sum(salaries) / len(salaries) if len(salaries) else 0
+    average_salary = int(sum(salaries) / len(salaries)) if len(salaries) else 0
     return {
         'vacancies_found': vacancies_found,
         'vacancies_processed': len(salaries),
@@ -62,7 +62,7 @@ def calculate_hh_statistics(vacancies, vacancies_found):
     }
 
 
-def predict_rub_salary_for_sj(vacancy):
+def predict_sj_rub_salary(vacancy):
     if vacancy['currency'] == 'rub':
         return predict_salary(vacancy['payment_from'], vacancy['payment_to'])
 
@@ -96,10 +96,10 @@ def get_sj_vacancies(token, profession, programming_language):
 def calculate_sj_statistics(vacancies, vacancies_found):
     salaries = []
     for vacancy in vacancies:
-        predicted_salary = predict_rub_salary_for_sj(vacancy)
+        predicted_salary = predict_sj_rub_salary(vacancy)
         if predicted_salary:
             salaries.append(predicted_salary)
-    average_salary = sum(salaries) / len(salaries) if len(salaries) else 0
+    average_salary = int(sum(salaries) / len(salaries)) if len(salaries) else 0
     return {
         'vacancies_found': vacancies_found,
         'vacancies_processed': len(salaries),
@@ -133,19 +133,19 @@ if __name__ == '__main__':
                              'C', 'C#', 'C++', 'PHP', 'Ruby',
                              'Python', 'Java', 'JavaScript'
                              ]
-    job_statistics_from_hh = {}
-    job_statistics_from_sj = {}
+    hh_job_statistics = {}
+    sj_job_statistics = {}
     for language in programming_languages:
         hh_vacancies, hh_vacancies_quantity = get_hh_vacancies(
             user_email, profession_name, language)
-        job_statistics_from_hh[language] = calculate_hh_statistics(
+        hh_job_statistics[language] = calculate_hh_statistics(
             hh_vacancies, hh_vacancies_quantity)
         sj_vacancies, sj_vacancies_quantity = get_sj_vacancies(
             sj_token, profession_name, language)
-        job_statistics_from_sj[language] = calculate_sj_statistics(
+        sj_job_statistics[language] = calculate_sj_statistics(
             sj_vacancies, sj_vacancies_quantity)
     hh_statistic_table = create_table_with_statistics(
-        job_statistics_from_hh, 'HeadHunter Moscow')
+        hh_job_statistics, 'HeadHunter Moscow')
     sj_statistic_table = create_table_with_statistics(
-        job_statistics_from_sj, 'SuperJob Moscow')
+        sj_job_statistics, 'SuperJob Moscow')
     print(hh_statistic_table, sj_statistic_table, sep='\n')
