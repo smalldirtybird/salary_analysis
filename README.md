@@ -33,7 +33,7 @@ Just run script and get info about programmer's salaries from two biggest russia
    to it instead of value in quotes. Here and further quotes must be removed.
 4. Add the string like
    ```
-   EMAIL=`your_e-mail_address`
+   HH_USER_EMAIL=`your_e-mail_address`
    ```
    with your email instead of value in quotes. This is required to access the Headhunter API according to the [documentation](https://github.com/hhru/api/blob/master/docs/general.md).
    

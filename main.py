@@ -126,7 +126,7 @@ def create_table_with_statistics(vacancy_statistics, table_name):
 if __name__ == '__main__':
     load_dotenv()
     profession_name = 'программист'
-    user_email = os.environ['EMAIL']
+    user_email = os.environ['HH_USER_EMAIL']
     sj_token = os.environ['SJ_TOKEN']
     programming_languages = ['TypeScript', 'Swift', 'Scala',
                              'Objective-C', 'Shell', 'Go',
