@@ -48,20 +48,6 @@ def get_hh_vacancies(email, profession, programming_language):
             return vacancies, page_content['found']
 
 
-def calculate_hh_statistics(vacancies, vacancies_found):
-    salaries = []
-    for vacancy in vacancies:
-        predicted_salary = predict_hh_rub_salary(vacancy)
-        if predicted_salary:
-            salaries.append(predicted_salary)
-    average_salary = int(sum(salaries) / len(salaries)) if len(salaries) else 0
-    return {
-        'vacancies_found': vacancies_found,
-        'vacancies_processed': len(salaries),
-        'average_salary': average_salary
-    }
-
-
 def predict_sj_rub_salary(vacancy):
     if vacancy['currency'] == 'rub':
         return predict_salary(vacancy['payment_from'], vacancy['payment_to'])
@@ -93,13 +79,13 @@ def get_sj_vacancies(token, profession, programming_language):
             return vacancies, page_content['total']
 
 
-def calculate_sj_statistics(vacancies, vacancies_found):
+def calculate_job_statistics(vacancies, vacancies_found, predict_rub_salary):
     salaries = []
     for vacancy in vacancies:
-        predicted_salary = predict_sj_rub_salary(vacancy)
+        predicted_salary = predict_rub_salary(vacancy)
         if predicted_salary:
             salaries.append(predicted_salary)
-    average_salary = int(sum(salaries) / len(salaries)) if len(salaries) else 0
+    average_salary = int(sum(salaries) / len(salaries)) if salaries else 0
     return {
         'vacancies_found': vacancies_found,
         'vacancies_processed': len(salaries),
@@ -138,12 +124,12 @@ if __name__ == '__main__':
     for language in programming_languages:
         hh_vacancies, hh_vacancies_quantity = get_hh_vacancies(
             user_email, profession_name, language)
-        hh_job_statistics[language] = calculate_hh_statistics(
-            hh_vacancies, hh_vacancies_quantity)
+        hh_job_statistics[language] = calculate_job_statistics(
+            hh_vacancies, hh_vacancies_quantity, predict_hh_rub_salary)
         sj_vacancies, sj_vacancies_quantity = get_sj_vacancies(
             sj_token, profession_name, language)
-        sj_job_statistics[language] = calculate_sj_statistics(
-            sj_vacancies, sj_vacancies_quantity)
+        sj_job_statistics[language] = calculate_job_statistics(
+            sj_vacancies, sj_vacancies_quantity, predict_sj_rub_salary)
     hh_statistic_table = create_table_with_statistics(
         hh_job_statistics, 'HeadHunter Moscow')
     sj_statistic_table = create_table_with_statistics(
